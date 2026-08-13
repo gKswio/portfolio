@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Vaccine — HTB Writeup — I.R. Karantakis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0A0E12;
+    --panel: #10151C;
+    --panel-2: #141B24;
+    --line: #212B36;
+    --line-soft: #1A222C;
+    --text: #E7ECF1;
+    --muted: #8496A6;
+    --muted-2: #566575;
+    --cyan: #4FD8C4;
+    --cyan-dim: rgba(79,216,196,0.14);
+    --amber: #FF9642;
+    --amber-dim: rgba(255,150,66,0.14);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;
+    line-height:1.65;-webkit-font-smoothing:antialiased;
+    background-image:
+      linear-gradient(var(--line-soft) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
+    background-size: 48px 48px;background-position:-1px -1px;
+  }
+  a{color:inherit;}
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  .wrap{max-width:820px;margin:0 auto;padding:0 28px;}
+  ::selection{background:var(--cyan-dim);color:var(--cyan);}
+  @media (prefers-reduced-motion: reduce){*{animation-duration:0.001ms !important;}}
+
+  .topbar{
+    position:sticky;top:0;z-index:50;background:rgba(10,14,18,0.85);
+    backdrop-filter: blur(10px);border-bottom:1px solid var(--line);
+  }
+  .topbar-inner{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:16px 28px;max-width:820px;margin:0 auto;
+  }
+  .brand{
+    font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:15px;
+    letter-spacing:0.02em;display:flex;align-items:center;gap:10px;
+    text-decoration:none;
+  }
+  .brand-dot{width:8px;height:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 8px var(--cyan);}
+  .back-link{
+    font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);
+    text-decoration:none;letter-spacing:0.03em;
+  }
+  .back-link:hover{color:var(--cyan);}
+
+  .header{padding:56px 0 40px;}
+  .eyebrow{
+    font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--amber);
+    letter-spacing:0.16em;text-transform:uppercase;margin-bottom:16px;
+    display:flex;align-items:center;gap:10px;
+  }
+  .eyebrow::before{content:'';width:22px;height:1px;background:var(--amber);display:inline-block;}
+  h1{
+    font-family:'Space Grotesk',sans-serif;font-weight:700;
+    font-size:clamp(30px, 5vw, 44px);line-height:1.08;letter-spacing:-0.01em;
+    margin-bottom:18px;
+  }
+  .badge-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:22px;}
+  .badge{
+    font-family:'IBM Plex Mono',monospace;font-size:11.5px;
+    border:1px solid var(--line);padding:6px 12px;border-radius:3px;
+    background:var(--panel);color:var(--text);
+  }
+  .badge.b-cyan{color:var(--cyan);border-color:rgba(79,216,196,0.35);}
+  .badge.b-amber{color:var(--amber);border-color:rgba(255,150,66,0.35);}
+  .target-line{
+    font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--muted);
+    padding:12px 16px;border:1px solid var(--line);border-left:2px solid var(--cyan);
+    background:var(--panel);border-radius:3px;
+  }
+
+  section{padding:36px 0;border-top:1px solid var(--line);}
+  section:first-of-type{border-top:none;}
+  .sec-title{
+    font-family:'Space Grotesk',sans-serif;font-size:19px;font-weight:600;
+    margin-bottom:16px;display:flex;align-items:center;gap:10px;
+  }
+  .sec-title .idx{font-family:'IBM Plex Mono',monospace;color:var(--muted-2);font-size:13px;font-weight:400;}
+
+  p{color:#C4CDD6;font-size:14.5px;margin-bottom:10px;}
+  p:last-child{margin-bottom:0;}
+
+  ul.note-list{list-style:none;margin-bottom:4px;}
+  ul.note-list li{
+    position:relative;padding-left:18px;margin-bottom:9px;
+    font-size:14.5px;color:#C4CDD6;
+  }
+  ul.note-list li::before{
+    content:'▸';position:absolute;left:0;color:var(--muted-2);font-size:12px;top:1px;
+  }
+  ul.note-list li strong{color:var(--text);}
+  ul.note-list .flag-note{color:var(--amber);}
+
+  code.inline{
+    font-family:'IBM Plex Mono',monospace;font-size:0.88em;
+    background:var(--panel-2);border:1px solid var(--line);
+    padding:1px 6px;border-radius:3px;color:var(--cyan);
+  }
+
+  pre{
+    font-family:'IBM Plex Mono',monospace;font-size:13px;color:#B9EFE4;
+    background:#0D1319;border:1px solid var(--line);border-left:2px solid var(--cyan);
+    border-radius:4px;padding:14px 16px;overflow-x:auto;margin:14px 0;
+    line-height:1.55;
+  }
+  pre .prompt{color:var(--amber);}
+
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13.5px;}
+  th{
+    font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted-2);
+    text-align:left;text-transform:uppercase;letter-spacing:0.05em;
+    padding:9px 12px;border-bottom:1px solid var(--line);
+  }
+  td{padding:9px 12px;border-bottom:1px solid var(--line-soft);color:#C4CDD6;}
+  td code.inline, td{font-size:13px;}
+
+  .flag-box{
+    margin-top:16px;font-family:'IBM Plex Mono',monospace;font-size:13px;
+    background:var(--amber-dim);border:1px solid rgba(255,150,66,0.35);
+    color:var(--amber);padding:12px 16px;border-radius:4px;
+  }
+
+  footer{padding:44px 0 60px;text-align:center;}
+  .footer-line{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--muted-2);letter-spacing:0.06em;}
+  :focus-visible{outline:1px solid var(--cyan);outline-offset:3px;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <a href="../index.html" class="brand"><span class="brand-dot"></span>I.R. KARANTAKIS</a>
+    <a href="../index.html" class="back-link">← BACK TO CV</a>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <div class="header">
+    <div class="eyebrow">HTB Writeup</div>
+    <h1>Vaccine</h1>
+    <div class="badge-row">
+      <span class="badge b-cyan">LINUX</span>
+      <span class="badge b-amber">VERY EASY</span>
+      <span class="badge">FTP</span>
+      <span class="badge">SQL INJECTION</span>
+      <span class="badge">POSTGRESQL</span>
+      <span class="badge">GTFOBINS</span>
+    </div>
+    <div class="target-line">TARGET // 10.129.45.252</div>
+  </div>
+
+  <section>
+    <div class="sec-title"><span class="idx">01</span> Recon</div>
+    <pre><span class="prompt">$</span> nmap -sC -sV 10.129.45.252</pre>
+    <table>
+      <tr><th>Port</th><th>Service</th><th>Version</th></tr>
+      <tr><td>21</td><td>FTP</td><td>vsftpd 3.0.3 — anonymous login allowed, file <code class="inline">backup.zip</code> present</td></tr>
+      <tr><td>22</td><td>SSH</td><td>OpenSSH 8.0p1 (Ubuntu)</td></tr>
+      <tr><td>80</td><td>HTTP</td><td>Apache 2.4.41 (Ubuntu) — page title "MegaCorp Login"</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <div class="sec-title"><span class="idx">02</span> FTP</div>
+    <ul class="note-list">
+      <li>Anonymous login allowed → found <code class="inline">backup.zip</code></li>
+      <li>Zip was password-protected, cracked with <code class="inline">zip2john</code> + <code class="inline">john</code> (rockyou.txt)</li>
+      <li>Password: <code class="inline">741852963</code></li>
+      <li>Contents: <code
