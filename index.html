@@ -217,6 +217,14 @@
   }
 
   /* certifications */
+  .cert-group{margin-bottom:26px;}
+  .cert-group:last-child{margin-bottom:0;}
+  .cert-group-title{
+    font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--amber);
+    letter-spacing:0.1em;text-transform:uppercase;margin-bottom:12px;
+    display:flex;align-items:center;gap:8px;
+  }
+  .cert-group-title::before{content:'';width:14px;height:1px;background:var(--amber);display:inline-block;}
   .cert-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
   @media (max-width:700px){.cert-grid{grid-template-columns:1fr;}}
   .cert{
@@ -266,11 +274,7 @@
       <div>
         <div class="eyebrow">Cybersecurity Engineer</div>
         <h1>Ioannis Rafail<br><span class="last">Karantakis</span></h1>
-        <div class="role">Cloud Security · Identity &amp; PAM · Threat Intelligence — former Air Battle Manager, Hellenic Air Force</div>
-        <div class="contact-row">
-          <a class="contact-chip" href="mailto:ioanniskarantakis3@gmail.com">✉ ioanniskarantakis3@gmail.com</a>
-          <a class="contact-chip" href="tel:+306984503400">☎ +30 698 450 3400</a>
-        </div>
+        <div class="role">Cloud Security · Threat Intelligence · Web Application Penetration Testing — former Air Battle Manager, Hellenic Air Force</div>
       </div>
 
     </div>
@@ -364,36 +368,55 @@
 
   <section id="certifications">
     <div class="sec-head"><span class="sec-num mono">03</span><span class="sec-title">Certifications<span class="accent">.</span></span></div>
-    <div class="cert-grid">
-      <div class="cert"><span class="cert-mark">//</span><span class="cert-name">Microsoft Certified: Identity and Access Administrator Associate — SC-300</span></div>
-      <div class="cert"><span class="cert-mark">//</span><span class="cert-name">Microsoft Certified Security Operations Analyst Associate — SC-200</span></div>
-      <div class="cert"><span class="cert-mark">//</span><span class="cert-name">Microsoft Certified: Information Security Administrator Associate — SC-401</span></div>
-      <div class="cert"><span class="cert-mark">//</span><span class="cert-name">Microsoft 365 Certified: Endpoint Administrator Associate</span></div>
-      <div class="cert"><span class="cert-mark">//</span><span class="cert-name">Microsoft Azure Security, Compliance, and Identity Fundamentals — SC-900</span></div>
-      <div class="cert"><span class="cert-mark">//</span><span class="cert-name">Microsoft Azure Fundamentals — AZ-900</span></div>
-      <div class="cert"><span class="cert-mark">//</span><span class="cert-name">CyberArk Defender — PAM</span></div>
-      <div class="cert"><span class="cert-mark">//</span><span class="cert-name">CISCO — Ethical Hacker</span><span class="cert-year">2025</span></div>
-      <div class="cert"><span class="cert-mark">//</span><span class="cert-name">eJPT — Junior Penetration Tester</span></div>
-      <div class="cert"><span class="cert-mark">//</span><span class="cert-name">Curtis-Wright GSS System Administrator</span><span class="cert-year">2024</span></div>
-      <div class="cert"><span class="cert-mark">//</span><span class="cert-name">Tactical Data Link Expert — Level 2</span><span class="cert-year">2023</span></div>
+
+    <div class="cert-group">
+      <div class="cert-group-title">Microsoft &amp; Azure</div>
+      <div class="cert-grid">
+        <div class="cert"><span class="cert-mark">//</span><span class="cert-name">Identity and Access Administrator Associate — SC-300</span></div>
+        <div class="cert"><span class="cert-mark">//</span><span class="cert-name">Security Operations Analyst Associate — SC-200</span></div>
+        <div class="cert"><span class="cert-mark">//</span><span class="cert-name">Information Security Administrator Associate — SC-401</span></div>
+        <div class="cert"><span class="cert-mark">//</span><span class="cert-name">365 Certified: Endpoint Administrator Associate</span></div>
+        <div class="cert"><span class="cert-mark">//</span><span class="cert-name">Azure Security, Compliance, and Identity Fundamentals — SC-900</span></div>
+        <div class="cert"><span class="cert-mark">//</span><span class="cert-name">Azure Fundamentals — AZ-900</span></div>
+      </div>
     </div>
+
+    <div class="cert-group">
+      <div class="cert-group-title">Privileged Access Management</div>
+      <div class="cert-grid">
+        <div class="cert"><span class="cert-mark">//</span><span class="cert-name">CyberArk Defender — PAM</span></div>
+      </div>
+    </div>
+
+    <div class="cert-group">
+      <div class="cert-group-title">Offensive Security</div>
+      <div class="cert-grid">
+        <div class="cert"><span class="cert-mark">//</span><span class="cert-name">CISCO — Ethical Hacker</span><span class="cert-year">2025</span></div>
+        <div class="cert"><span class="cert-mark">//</span><span class="cert-name">eJPT — Junior Penetration Tester</span></div>
+      </div>
+    </div>
+
+    <div class="cert-group">
+      <div class="cert-group-title">Tactical Systems</div>
+      <div class="cert-grid">
+        <div class="cert"><span class="cert-mark">//</span><span class="cert-name">Curtis-Wright GSS System Administrator</span><span class="cert-year">2024</span></div>
+        <div class="cert"><span class="cert-mark">//</span><span class="cert-name">Tactical Data Link Expert — Level 2</span><span class="cert-year">2023</span></div>
+      </div>
+    </div>
+
   </section>
 
   <section id="contact">
     <div class="sec-head"><span class="sec-num mono">04</span><span class="sec-title">Contact<span class="accent">.</span></span></div>
     <div class="summary">
       <p>Open to cloud security, threat intelligence, and web application penetration testing opportunities.</p>
-      <div class="contact-row">
-        <a class="contact-chip" href="mailto:ioanniskarantakis3@gmail.com">✉ ioanniskarantakis3@gmail.com</a>
-        <a class="contact-chip" href="tel:+306984503400">☎ +30 698 450 3400</a>
-      </div>
     </div>
   </section>
 
 </div>
 
 <footer>
-  <div class="footer-line"><span class="status-ok">●</span> END OF TRANSMISSION — LAST UPDATED AUG 2026</div>
+  <div class="footer-line">LAST UPDATED AUG 2026</div>
 </footer>
 
 </body>
