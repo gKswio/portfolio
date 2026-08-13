@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ioannis Rafail Karantakis — Cybersecurity Engineer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0A0E12;
+    --panel: #10151C;
+    --panel-2: #141B24;
+    --line: #212B36;
+    --line-soft: #1A222C;
+    --text: #E7ECF1;
+    --muted: #8496A6;
+    --muted-2: #566575;
+    --cyan: #4FD8C4;
+    --cyan-dim: rgba(79,216,196,0.14);
+    --amber: #FF9642;
+    --amber-dim: rgba(255,150,66,0.14);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Inter',sans-serif;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    background-image:
+      linear-gradient(var(--line-soft) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
+    background-size: 48px 48px;
+    background-position: -1px -1px;
+  }
+  a{color:inherit;}
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  .wrap{max-width:920px;margin:0 auto;padding:0 28px;}
+
+  ::selection{background:var(--cyan-dim);color:var(--cyan);}
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important;}
+  }
+
+  /* ---------- topbar ---------- */
+  .topbar{
+    position:sticky;top:0;z-index:50;
+    background:rgba(10,14,18,0.85);
+    backdrop-filter: blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  .topbar-inner{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:16px 28px;max-width:920px;margin:0 auto;
+  }
+  .brand{
+    font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:15px;
+    letter-spacing:0.02em;
+    display:flex;align-items:center;gap:10px;
+  }
+  .brand-dot{width:8px;height:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 8px var(--cyan);animation:blink 2.4s ease-in-out infinite;}
+  @keyframes blink{0%,100%{opacity:1;}50%{opacity:0.35;}}
+  .navlinks{display:flex;gap:26px;font-size:12.5px;}
+  .navlinks a{
+    color:var(--muted);text-decoration:none;
+    font-family:'IBM Plex Mono',monospace;
+    letter-spacing:0.03em;
+    transition:color .15s ease;
+    padding:4px 0;border-bottom:1px solid transparent;
+  }
+  .navlinks a:hover, .navlinks a:focus-visible{color:var(--cyan);border-color:var(--cyan);}
+  @media (max-width:640px){.navlinks{display:none;}}
+
+  /* ---------- hero ---------- */
+  .hero{padding:76px 0 60px;position:relative;overflow:hidden;}
+  .status-line{
+    font-size:11.5px;color:var(--muted-2);letter-spacing:0.08em;
+    display:flex;gap:18px;flex-wrap:wrap;margin-bottom:36px;
+  }
+  .status-line span{display:flex;align-items:center;gap:7px;}
+  .status-ok{color:var(--cyan);}
+
+  .hero-grid{
+    display:block;
+  }
+
+  .eyebrow{
+    font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--amber);
+    letter-spacing:0.16em;text-transform:uppercase;margin-bottom:18px;
+    display:flex;align-items:center;gap:10px;
+  }
+  .eyebrow::before{content:'';width:22px;height:1px;background:var(--amber);display:inline-block;}
+
+  h1{
+    font-family:'Space Grotesk',sans-serif;
+    font-weight:700;
+    font-size:clamp(34px, 6vw, 54px);
+    line-height:1.05;
+    letter-spacing:-0.01em;
+    margin-bottom:16px;
+  }
+  h1 .last{color:var(--cyan);}
+
+  .role{
+    font-size:16px;color:var(--muted);font-weight:500;margin-bottom:26px;
+  }
+
+  .contact-row{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:8px;}
+  .contact-chip{
+    font-family:'IBM Plex Mono',monospace;font-size:12.5px;
+    border:1px solid var(--line);padding:8px 14px;border-radius:3px;
+    color:var(--text);text-decoration:none;
+    display:flex;align-items:center;gap:8px;
+    transition:border-color .15s ease, color .15s ease;
+  }
+  .contact-chip:hover{border-color:var(--cyan);color:var(--cyan);}
+
+  /* radar */
+  .radar-wrap{display:flex;align-items:center;justify-content:center;position:relative;}
+  .radar{
+    width:290px;height:290px;border-radius:50%;position:relative;
+    border:1px solid var(--line);
+    background:radial-gradient(circle at center, rgba(79,216,196,0.05) 0%, transparent 70%);
+  }
+  .radar::before, .radar::after{
+    content:'';position:absolute;border-radius:50%;border:1px solid var(--line-soft);
+  }
+  .radar::before{inset:38px;}
+  .radar::after{inset:76px;}
+  .radar-core{position:absolute;inset:114px;border-radius:50%;border:1px solid var(--line-soft);}
+  .radar-cross-h, .radar-cross-v{position:absolute;background:var(--line-soft);}
+  .radar-cross-h{left:0;right:0;top:50%;height:1px;}
+  .radar-cross-v{top:0;bottom:0;left:50%;width:1px;}
+  .sweep{
+    position:absolute;inset:0;border-radius:50%;
+    background:conic-gradient(from 0deg, rgba(79,216,196,0.32), transparent 32%);
+    animation:spin 5s linear infinite;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .blip{
+    position:absolute;width:7px;height:7px;border-radius:50%;
+    background:var(--amber);box-shadow:0 0 10px var(--amber);
+  }
+  .blip-label{
+    position:absolute;font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);
+    white-space:nowrap;letter-spacing:0.04em;
+  }
+  .b1{top:22%;left:66%;} .b1l{top:19%;left:70%;}
+  .b2{top:64%;left:28%;} .b2l{top:68%;left:12%;}
+  .b3{top:38%;left:20%;} .b3l{top:33%;left:2%;}
+  .b4{top:74%;left:70%;} .b4l{top:78%;left:64%;}
+  .radar-label{
+    position:absolute;bottom:-30px;left:50%;transform:translateX(-50%);
+    font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--muted-2);
+    letter-spacing:0.12em;text-align:center;white-space:nowrap;
+  }
+  @media (max-width:760px){.radar{width:220px;height:220px;} .radar::before{inset:28px;} .radar::after{inset:58px;} .radar-core{inset:86px;}}
+
+  /* ---------- section shell ---------- */
+  section{padding:64px 0;border-top:1px solid var(--line);}
+  .sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:34px;}
+  .sec-num{font-family:'IBM Plex Mono',monospace;color:var(--muted-2);font-size:13px;}
+  .sec-title{font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:600;letter-spacing:-0.01em;}
+  .sec-title .accent{color:var(--cyan);}
+
+  /* summary */
+  .summary p{color:#C4CDD6;font-size:15.5px;max-width:680px;margin-bottom:14px;}
+  .summary p:last-child{margin-bottom:0;}
+  .summary strong{color:var(--text);font-weight:600;}
+
+  /* experience timeline */
+  .timeline{position:relative;padding-left:26px;}
+  .timeline::before{
+    content:'';position:absolute;left:5px;top:6px;bottom:6px;width:1px;
+    background:linear-gradient(var(--cyan), var(--line) 85%);
+  }
+  .tl-item{position:relative;padding-bottom:44px;}
+  .tl-item:last-child{padding-bottom:0;}
+  .tl-dot{
+    position:absolute;left:-26px;top:5px;width:11px;height:11px;border-radius:50%;
+    background:var(--bg);border:2px solid var(--cyan);
+  }
+  .tl-item.past .tl-dot{border-color:var(--muted-2);}
+  .tl-date{
+    font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);
+    letter-spacing:0.05em;margin-bottom:6px;
+  }
+  .tl-item.past .tl-date{color:var(--muted);}
+  .tl-role{font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:600;margin-bottom:2px;}
+  .tl-org{font-size:13.5px;color:var(--amber);margin-bottom:14px;font-weight:500;}
+  .tl-list{list-style:none;}
+  .tl-list li{
+    position:relative;padding-left:18px;margin-bottom:9px;
+    font-size:14.5px;color:#B7C1CB;
+  }
+  .tl-list li::before{
+    content:'▸';position:absolute;left:0;color:var(--muted-2);font-size:12px;top:2px;
+  }
+
+  /* education */
+  .edu-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;}
+  @media (max-width:700px){.edu-grid{grid-template-columns:1fr;}}
+  .edu-card{
+    background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:24px;
+  }
+  .edu-date{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--muted-2);margin-bottom:10px;letter-spacing:0.04em;}
+  .edu-school{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:16px;margin-bottom:2px;}
+  .edu-track{font-size:13px;color:var(--muted);margin-bottom:14px;}
+  .tag-row{display:flex;flex-wrap:wrap;gap:7px;}
+  .tag{
+    font-family:'IBM Plex Mono',monospace;font-size:11px;color:#AEB9C4;
+    border:1px solid var(--line);padding:4px 9px;border-radius:3px;background:var(--panel-2);
+  }
+
+  /* certifications */
+  .cert-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  @media (max-width:700px){.cert-grid{grid-template-columns:1fr;}}
+  .cert{
+    display:flex;align-items:center;gap:12px;
+    border:1px solid var(--line);border-radius:5px;padding:13px 16px;
+    background:var(--panel);
+    transition:border-color .15s ease, transform .15s ease;
+  }
+  .cert:hover{border-color:var(--cyan);}
+  .cert-mark{font-family:'IBM Plex Mono',monospace;color:var(--cyan);font-size:11px;flex-shrink:0;}
+  .cert-name{font-size:13.5px;color:var(--text);}
+  .cert-year{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted-2);margin-left:auto;flex-shrink:0;padding-left:10px;}
+
+  /* footer */
+  footer{padding:44px 0 60px;text-align:center;}
+  .footer-line{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--muted-2);letter-spacing:0.06em;}
+  .footer-line .status-ok{color:var(--cyan);}
+
+  :focus-visible{outline:1px solid var(--cyan);outline-offset:3px;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="brand"><span class="brand-dot"></span>I.R. KARANTAKIS</div>
+    <nav class="navlinks">
+      <a href="#experience">EXPERIENCE</a>
+      <a href="#education">EDUCATION</a>
+      <a href="#certifications">CERTS</a>
+      <a href="#contact">CONTACT</a>
+    </nav>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <section class="hero" style="border-top:none;">
+    <div class="status-line">
+      <span><span class="status-ok">●</span> STATUS: ACTIVE</span>
+      <span>LOCATION: GREECE</span>
+      <span>DOMAIN: CLOUD &amp; CYBERSECURITY</span>
+    </div>
+
+    <div class="hero-grid">
+      <div>
+        <div class="eyebrow">Cybersecurity Engineer</div>
+        <h1>Ioannis Rafail<br><span class="last">Karantakis</span></h1>
+        <div class="role">Cloud Security · Identity &amp; PAM · Threat Intelligence — former Air Battle Manager, Hellenic Air Force</div>
+        <div class="contact-row">
+          <a class="contact-chip" href="mailto:ioanniskarantakis3@gmail.com">✉ ioanniskarantakis3@gmail.com</a>
+          <a class="contact-chip" href="tel:+306984503400">☎ +30 698 450 3400</a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section id="summary">
+    <div class="sec-head"><span class="sec-num mono">00</span><span class="sec-title">Profile<span class="accent">.</span></span></div>
+    <div class="summary">
+      <p>Cybersecurity Engineer with enterprise security experience across <strong>Azure and Microsoft 365 security assessments</strong>, <strong>Microsoft Entra ID</strong> identity architecture, <strong>CyberArk PAM</strong> implementations, threat intelligence and cloud migration security projects — combined with a strong, active interest in offensive security and penetration testing.</p>
+      <p>Retired military officer (<strong>Air Battle Manager</strong>, Hellenic Air Force) with 8 years of professional experience, bringing a disciplined, mission-oriented mindset to both defensive and offensive security work under time-critical, high-pressure conditions.</p>
+      <p>Currently engaged in web application penetration testing training and hands-on labs, building toward offensive security work alongside cloud and identity security.</p>
+    </div>
+  </section>
+
+  <section id="experience">
+    <div class="sec-head"><span class="sec-num mono">01</span><span class="sec-title">Experience<span class="accent">.</span></span></div>
+
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-date">2025 — PRESENT</div>
+        <div class="tl-role">Cloud Security Engineer</div>
+        <div class="tl-org">PwC</div>
+        <ul class="tl-list">
+          <li>Led Azure migration security for a large-scale company, ensuring secure configurations and alignment with security requirements throughout cloud transition.</li>
+          <li>Configured Microsoft Entra ID identity architecture, including conditional access, role-based access control (RBAC), and hybrid identity integrations.</li>
+          <li>Operated Microsoft Intune and Microsoft Defender for Endpoint for device and endpoint security.</li>
+          <li>Threat hunting using KQL to identify anomalous behaviors across the environment.</li>
+          <li>Implemented CyberArk Privileged Access Management (PAM), including installation of PSM, PSMP and CPM.</li>
+          <li>Monitored and analyzed threat intelligence using Cognyte's Luminar platform to identify emerging risks and indicators.</li>
+          <li>Conducted Azure and Microsoft 365 security assessments, identifying gaps and recommending remediation aligned with best practices.</li>
+        </ul>
+      </div>
+
+      <div class="tl-item past">
+        <div class="tl-dot"></div>
+        <div class="tl-date">2021 — 2024</div>
+        <div class="tl-role">UAS / Drone Certified Flight &amp; Ground Instructor</div>
+        <div class="tl-org">Squadrone Academy</div>
+        <ul class="tl-list">
+          <li>Teach UAS safety, risk management, and pre-flight checklist procedures.</li>
+          <li>Provide hands-on flight training across various drone platforms.</li>
+          <li>Enforce standard operating procedures (SOPs), risk assessments (PDRA &amp; SORA), and safety protocols.</li>
+        </ul>
+      </div>
+
+      <div class="tl-item past">
+        <div class="tl-dot"></div>
+        <div class="tl-date">2017 — 2025</div>
+        <div class="tl-role">Tactical Data Link Manager &amp; Administrator</div>
+        <div class="tl-org">Hellenic Air Force</div>
+        <ul class="tl-list">
+          <li>Specialized in Link-16, JREAP-C and Link-11 tactical data link operations, utilizing GSS for tactical data processing, mission coordination and operation visualization.</li>
+          <li>Applied traditional IT skills — servers and networking — while operating and maintaining MIDS (Multifunctional Information Distribution System) terminals.</li>
+          <li>Operated in high-pressure joint environments requiring coordination, situational awareness and rapid decision-making.</li>
+          <li>Participated in NATO exercises and the Tactical Leadership Programme (TLP), following standardized NATO procedures and security protocols.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="education">
+    <div class="sec-head"><span class="sec-num mono">02</span><span class="sec-title">Education<span class="accent">.</span></span></div>
+    <div class="edu-grid">
+      <div class="edu-card">
+        <div class="edu-date">2024 — 2025</div>
+        <div class="edu-school">University of West Attica</div>
+        <div class="edu-track">MSc in Cybersecurity</div>
+        <div class="tag-row">
+          <span class="tag">Network Security</span>
+          <span class="tag">Applied Cryptography</span>
+          <span class="tag">GRC</span>
+          <span class="tag">Penetration Testing</span>
+          <span class="tag">Cloud Security</span>
+        </div>
+      </div>
+      <div class="edu-card">
+        <div class="edu-date">2013 — 2017</div>
+        <div class="edu-school">Hellenic Air Force Academy</div>
+        <div class="edu-track">Air Defense &amp; Operations Management</div>
+        <div class="tag-row">
+          <span class="tag">Avionics &amp; Comms</span>
+          <span class="tag">Electronic Warfare / SIGINT</span>
+          <span class="tag">GRC</span>
+          <span class="tag">Defense Techniques</span>
+          <span class="tag">Python Basics</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="certifications">
+    <div class="sec-head"><span class="sec-num mono">03</span><span class="sec-title">Certifications<span class="accent">.</span></span></div>
+    <div class="cert-grid">
+      <div class="cert"><span class="cert-mark">//</span><span class="cert-name">Microsoft Certified: Identity and Access Administrator Associate — SC-300</span></div>
+      <div class="cert"><span class="cert-mark">//</span><span class="cert-name">Microsoft Certified Security Operations Analyst Associate — SC-200</span></div>
+      <div class="cert"><span class="cert-mark">//</span><span class="cert-name">Microsoft Certified: Information Security Administrator Associate — SC-401</span></div>
+      <div class="cert"><span class="cert-mark">//</span><span class="cert-name">Microsoft 365 Certified: Endpoint Administrator Associate</span></div>
+      <div class="cert"><span class="cert-mark">//</span><span class="cert-name">Microsoft Azure Security, Compliance, and Identity Fundamentals — SC-900</span></div>
+      <div class="cert"><span class="cert-mark">//</span><span class="cert-name">Microsoft Azure Fundamentals — AZ-900</span></div>
+      <div class="cert"><span class="cert-mark">//</span><span class="cert-name">CyberArk Defender — PAM</span></div>
+      <div class="cert"><span class="cert-mark">//</span><span class="cert-name">CISCO — Ethical Hacker</span><span class="cert-year">2025</span></div>
+      <div class="cert"><span class="cert-mark">//</span><span class="cert-name">eJPT — Junior Penetration Tester</span></div>
+      <div class="cert"><span class="cert-mark">//</span><span class="cert-name">Curtis-Wright GSS System Administrator</span><span class="cert-year">2024</span></div>
+      <div class="cert"><span class="cert-mark">//</span><span class="cert-name">Tactical Data Link Expert — Level 2</span><span class="cert-year">2023</span></div>
+    </div>
+  </section>
+
+  <section id="contact">
+    <div class="sec-head"><span class="sec-num mono">04</span><span class="sec-title">Contact<span class="accent">.</span></span></div>
+    <div class="summary">
+      <p>Open to cloud security, threat intelligence, and web application penetration testing opportunities.</p>
+      <div class="contact-row">
+        <a class="contact-chip" href="mailto:ioanniskarantakis3@gmail.com">✉ ioanniskarantakis3@gmail.com</a>
+        <a class="contact-chip" href="tel:+306984503400">☎ +30 698 450 3400</a>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <div class="footer-line"><span class="status-ok">●</span> END OF TRANSMISSION — LAST UPDATED AUG 2026</div>
+</footer>
+
+</body>
+</html>
