@@ -73,13 +73,6 @@
     padding:4px 0;border-bottom:1px solid transparent;
   }
   .navlinks a:hover, .navlinks a:focus-visible{color:var(--cyan);border-color:var(--cyan);}
-  .navlinks a.nav-highlight{
-    color:var(--cyan);border:1px solid rgba(79,216,196,0.4);
-    background:var(--cyan-dim);border-radius:4px;padding:6px 12px;
-  }
-  .navlinks a.nav-highlight:hover, .navlinks a.nav-highlight:focus-visible{
-    background:rgba(79,216,196,0.24);border-color:var(--cyan);
-  }
   @media (max-width:640px){.navlinks{display:none;}}
 
   /* ---------- hero ---------- */
@@ -262,7 +255,7 @@
       <a href="#experience">EXPERIENCE</a>
       <a href="#education">EDUCATION</a>
       <a href="#certifications">CERTS</a>
-      <a href="writeups/index.html" class="nav-highlight">WRITEUPS</a>
+      <a href="writeups/index.html">WRITEUPS</a>
       <a href="#contact">CONTACT</a>
     </nav>
   </div>
@@ -414,8 +407,16 @@
 
   </section>
 
+  <section id="writeups-promo">
+    <div class="sec-head"><span class="sec-num mono">04</span><span class="sec-title">Writeups<span class="accent">.</span></span></div>
+    <div class="summary">
+      <p>Hands-on penetration testing practice — Hack The Box machines and web application testing notes, documented step by step from recon through exploitation.</p>
+    </div>
+    <a href="writeups/index.html" class="contact-chip" style="display:inline-flex;margin-top:14px;">VIEW WRITEUPS →</a>
+  </section>
+
   <section id="contact">
-    <div class="sec-head"><span class="sec-num mono">04</span><span class="sec-title">Contact<span class="accent">.</span></span></div>
+    <div class="sec-head"><span class="sec-num mono">05</span><span class="sec-title">Contact<span class="accent">.</span></span></div>
     <div class="summary">
       <p>Open to cloud security, threat intelligence, and web application penetration testing opportunities.</p>
     </div>
