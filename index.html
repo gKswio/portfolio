@@ -73,6 +73,13 @@
     padding:4px 0;border-bottom:1px solid transparent;
   }
   .navlinks a:hover, .navlinks a:focus-visible{color:var(--cyan);border-color:var(--cyan);}
+  .navlinks a.nav-highlight{
+    color:var(--cyan);border:1px solid rgba(79,216,196,0.4);
+    background:var(--cyan-dim);border-radius:4px;padding:6px 12px;
+  }
+  .navlinks a.nav-highlight:hover, .navlinks a.nav-highlight:focus-visible{
+    background:rgba(79,216,196,0.24);border-color:var(--cyan);
+  }
   @media (max-width:640px){.navlinks{display:none;}}
 
   /* ---------- hero ---------- */
@@ -255,7 +262,7 @@
       <a href="#experience">EXPERIENCE</a>
       <a href="#education">EDUCATION</a>
       <a href="#certifications">CERTS</a>
-      <a href="writeups/index.html">WRITEUPS</a>
+      <a href="writeups/index.html" class="nav-highlight">WRITEUPS</a>
       <a href="#contact">CONTACT</a>
     </nav>
   </div>
