@@ -119,47 +119,6 @@
   }
   .contact-chip:hover{border-color:var(--cyan);color:var(--cyan);}
 
-  /* radar */
-  .radar-wrap{display:flex;align-items:center;justify-content:center;position:relative;}
-  .radar{
-    width:290px;height:290px;border-radius:50%;position:relative;
-    border:1px solid var(--line);
-    background:radial-gradient(circle at center, rgba(79,216,196,0.05) 0%, transparent 70%);
-  }
-  .radar::before, .radar::after{
-    content:'';position:absolute;border-radius:50%;border:1px solid var(--line-soft);
-  }
-  .radar::before{inset:38px;}
-  .radar::after{inset:76px;}
-  .radar-core{position:absolute;inset:114px;border-radius:50%;border:1px solid var(--line-soft);}
-  .radar-cross-h, .radar-cross-v{position:absolute;background:var(--line-soft);}
-  .radar-cross-h{left:0;right:0;top:50%;height:1px;}
-  .radar-cross-v{top:0;bottom:0;left:50%;width:1px;}
-  .sweep{
-    position:absolute;inset:0;border-radius:50%;
-    background:conic-gradient(from 0deg, rgba(79,216,196,0.32), transparent 32%);
-    animation:spin 5s linear infinite;
-  }
-  @keyframes spin{to{transform:rotate(360deg);}}
-  .blip{
-    position:absolute;width:7px;height:7px;border-radius:50%;
-    background:var(--amber);box-shadow:0 0 10px var(--amber);
-  }
-  .blip-label{
-    position:absolute;font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);
-    white-space:nowrap;letter-spacing:0.04em;
-  }
-  .b1{top:22%;left:66%;} .b1l{top:19%;left:70%;}
-  .b2{top:64%;left:28%;} .b2l{top:68%;left:12%;}
-  .b3{top:38%;left:20%;} .b3l{top:33%;left:2%;}
-  .b4{top:74%;left:70%;} .b4l{top:78%;left:64%;}
-  .radar-label{
-    position:absolute;bottom:-30px;left:50%;transform:translateX(-50%);
-    font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--muted-2);
-    letter-spacing:0.12em;text-align:center;white-space:nowrap;
-  }
-  @media (max-width:760px){.radar{width:220px;height:220px;} .radar::before{inset:28px;} .radar::after{inset:58px;} .radar-core{inset:86px;}}
-
   /* ---------- section shell ---------- */
   section{padding:64px 0;border-top:1px solid var(--line);}
   .sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:34px;}
@@ -199,6 +158,98 @@
   }
   .tl-list li::before{
     content:'▸';position:absolute;left:0;color:var(--muted-2);font-size:12px;top:2px;
+  }
+
+  /* ---- interactive project bullets (hover / tap popup) ---- */
+  .tl-list.proj-list{overflow:visible;}
+  .proj-item{position:relative;overflow:visible;}
+  .proj-title{
+    all:unset;
+    cursor:pointer;
+    color:var(--text);
+    font-size:14.5px;
+    border-bottom:1px dashed var(--muted-2);
+    padding-bottom:1px;
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    transition:color .15s ease, border-color .15s ease;
+  }
+  .proj-title:hover, .proj-title:focus-visible, .proj-item.open .proj-title{
+    color:var(--cyan);
+    border-color:var(--cyan);
+  }
+  .proj-title .hint-icon{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10px;
+    color:var(--muted-2);
+    border:1px solid var(--line);
+    border-radius:50%;
+    width:15px;height:15px;
+    display:inline-flex;align-items:center;justify-content:center;
+    flex-shrink:0;
+    transition:border-color .15s ease, color .15s ease, transform .15s ease;
+  }
+  .proj-title:hover .hint-icon, .proj-title:focus-visible .hint-icon, .proj-item.open .proj-title .hint-icon{
+    border-color:var(--cyan);color:var(--cyan);transform:rotate(45deg);
+  }
+
+  .proj-pop{
+    position:absolute;
+    top:calc(100% + 10px);
+    left:0;
+    width:min(380px, 82vw);
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:18px 20px;
+    box-shadow:0 14px 34px rgba(0,0,0,0.45);
+    opacity:0;
+    visibility:hidden;
+    transform:translateY(-6px);
+    transition:opacity .16s ease, transform .16s ease, visibility .16s;
+    z-index:30;
+    pointer-events:none;
+  }
+  .proj-pop::before{
+    content:'';
+    position:absolute;
+    top:-7px;left:18px;
+    width:12px;height:12px;
+    background:var(--panel);
+    border-left:1px solid var(--line);
+    border-top:1px solid var(--line);
+    transform:rotate(45deg);
+  }
+  .proj-item:hover .proj-pop,
+  .proj-title:focus-visible + .proj-pop,
+  .proj-item.open .proj-pop{
+    opacity:1;
+    visibility:visible;
+    transform:translateY(0);
+    pointer-events:auto;
+  }
+  .proj-pop p{
+    font-size:13.5px;
+    color:#C4CDD6;
+    line-height:1.55;
+    margin-bottom:12px;
+  }
+  .proj-tech-label{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10px;
+    color:var(--amber);
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    margin-bottom:8px;
+  }
+  .proj-tech{display:flex;flex-wrap:wrap;gap:6px;}
+  .proj-tech .tag{
+    font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#AEB9C4;
+    border:1px solid var(--line);padding:3px 8px;border-radius:3px;background:var(--panel-2);
+  }
+  @media (max-width:600px){
+    .proj-pop{left:-8px;}
   }
 
   /* education */
@@ -274,7 +325,7 @@
       <div>
         <div class="eyebrow">Cybersecurity Engineer</div>
         <h1>Ioannis Rafail<br><span class="last">Karantakis</span></h1>
-        <div class="role">Cloud Security · Threat Intelligence · Web Application Penetration Testing — former Air Battle Manager, Hellenic Air Force</div>
+        <div class="role">Cyber Security Engineer · Threat Intelligence · Web Application Penetration Testing — former Air Battle Manager, Hellenic Air Force</div>
       </div>
 
     </div>
@@ -293,46 +344,178 @@
     <div class="sec-head"><span class="sec-num mono">01</span><span class="sec-title">Experience<span class="accent">.</span></span></div>
 
     <div class="timeline">
+
+      <!-- PwC -->
       <div class="tl-item">
         <div class="tl-dot"></div>
         <div class="tl-date">2025 — PRESENT</div>
-        <div class="tl-role">Cloud Security Engineer</div>
+        <div class="tl-role">Cyber Security Engineer</div>
         <div class="tl-org">PwC</div>
-        <ul class="tl-list">
-          <li>Azure migration security for a large-scale company, ensuring secure configurations and alignment with security requirements throughout cloud transition, and led the device migration process from tenant to tenant.</li>
-          <li>Configured Microsoft Entra ID identity architecture, including conditional access, role-based access control (RBAC), and hybrid identity integrations.</li>
-          <li>Operated Microsoft Intune and Microsoft Defender for Endpoint for device and endpoint security.</li>
-          <li>Threat hunting using KQL to identify anomalous behaviors across the environment.</li>
-          <li>Implemented CyberArk Privileged Access Management (PAM), including installation of PSM, PSMP and CPM.</li>
-          <li>Monitored and analyzed threat intelligence using Cognyte's Luminar platform to identify emerging risks and indicators.</li>
-          <li>Conducted Azure and Microsoft 365 security assessments, identifying gaps and recommending remediation aligned with best practices.</li>
+        <ul class="tl-list proj-list">
+
+          <li class="proj-item">
+            <button class="proj-title" type="button" aria-expanded="false">CyberArk PAM Deployment &amp; Support<span class="hint-icon">+</span></button>
+            <div class="proj-pop">
+              <p>Deployed CyberArk PAM infrastructure — PSM, PSM for SSH (PSMP), and CPM — including secure connection components for session isolation/recording and automated credential rotation policies. Provide ongoing support: safe design, platform troubleshooting, and onboarding of privileged accounts under least-privilege principles.</p>
+              <div class="proj-tech-label">Technologies</div>
+              <div class="proj-tech">
+                <span class="tag">CyberArk PSM</span>
+                <span class="tag">PSMP</span>
+                <span class="tag">CPM</span>
+                <span class="tag">RDP / SSH</span>
+              </div>
+            </div>
+          </li>
+
+          <li class="proj-item">
+            <button class="proj-title" type="button" aria-expanded="false">Azure &amp; Microsoft 365 Security Assessments<span class="hint-icon">+</span></button>
+            <div class="proj-pop">
+              <p>Performed security posture assessments across client Azure tenants and Microsoft 365 environments, benchmarking Conditional Access, Entra ID role assignments, network security group rules, and encryption settings against CIS Benchmarks and Microsoft baselines. Delivered prioritized, actionable remediation reports rather than generic checklists.</p>
+              <div class="proj-tech-label">Technologies</div>
+              <div class="proj-tech">
+                <span class="tag">Microsoft Entra ID</span>
+                <span class="tag">Defender for Cloud</span>
+                <span class="tag">CIS Benchmarks</span>
+                <span class="tag">Secure Score</span>
+              </div>
+            </div>
+          </li>
+
+          <li class="proj-item">
+            <button class="proj-title" type="button" aria-expanded="false">Microsoft Defender XDR Rollout<span class="hint-icon">+</span></button>
+            <div class="proj-pop">
+              <p>Deployed Microsoft Defender XDR across Identity, Endpoint, Cloud Apps and Office 365. Onboarded Windows and Linux endpoints, configured detection/alerting policies, and tuned the platform to correlate identity, endpoint, cloud app, and email signals into a single investigation surface.</p>
+              <div class="proj-tech-label">Technologies</div>
+              <div class="proj-tech">
+                <span class="tag">Defender for Identity</span>
+                <span class="tag">Defender for Endpoint</span>
+                <span class="tag">Defender for Cloud Apps</span>
+                <span class="tag">Defender for Office 365</span>
+              </div>
+            </div>
+          </li>
+
+          <li class="proj-item">
+            <button class="proj-title" type="button" aria-expanded="false">Tenant-to-Tenant Migration &amp; Device Management<span class="hint-icon">+</span></button>
+            <div class="proj-pop">
+              <p>Tenant-to-tenant Microsoft 365 migrations — mailboxes, identities and configurations — coordinating DNS/MX cutover for uninterrupted mail flow. Managed device migrations into Intune (enrollment, compliance policy) and administer file share access via Active Directory security groups under least-privilege.</p>
+              <div class="proj-tech-label">Technologies</div>
+              <div class="proj-tech">
+                <span class="tag">Microsoft 365</span>
+                <span class="tag">Microsoft Intune</span>
+                <span class="tag">Active Directory</span>
+                <span class="tag">DNS / MX</span>
+              </div>
+            </div>
+          </li>
+
+          <li class="proj-item">
+            <button class="proj-title" type="button" aria-expanded="false">Threat Intelligence Monitoring &amp; Reporting<span class="hint-icon">+</span></button>
+            <div class="proj-pop">
+              <p>Ran continuous threat intelligence monitoring via Cognyte's Luminar, tracking emerging threats, CVEs, compromised credentials, and indicators of compromise (IOCs) relevant to client environments. Performed attack surface management (ASM), identifying exposed assets and reducing external risk exposure. Produced structured threat intelligence reports summarizing findings and prioritizing risks for client stakeholders.</p>
+              <div class="proj-tech-label">Technologies</div>
+              <div class="proj-tech">
+                <span class="tag">Cognyte Luminar</span>
+                <span class="tag">CVEs</span>
+                <span class="tag">Compromised Credentials</span>
+                <span class="tag">ASM</span>
+                <span class="tag">IOCs</span>
+                <span class="tag">Threat Intelligence Reporting</span>
+              </div>
+            </div>
+          </li>
+
         </ul>
       </div>
 
-      <div class="tl-item past">
-        <div class="tl-dot"></div>
-        <div class="tl-date">2021 — 2024</div>
-        <div class="tl-role">UAS / Drone Certified Flight &amp; Ground Instructor</div>
-        <div class="tl-org">Squadrone Academy</div>
-        <ul class="tl-list">
-          <li>Teach UAS safety, risk management, and pre-flight checklist procedures.</li>
-          <li>Provide hands-on flight training across various drone platforms.</li>
-          <li>Enforce standard operating procedures (SOPs), risk assessments (PDRA &amp; SORA), and safety protocols.</li>
-        </ul>
-      </div>
-
+      <!-- Hellenic Air Force -->
       <div class="tl-item past">
         <div class="tl-dot"></div>
         <div class="tl-date">2017 — 2025</div>
         <div class="tl-role">Tactical Data Link Manager &amp; Administrator</div>
         <div class="tl-org">Hellenic Air Force</div>
-        <ul class="tl-list">
-          <li>Specialized in Link-16, JREAP-C and Link-11 tactical data link operations, utilizing GSS for tactical data processing, mission coordination and operation visualization.</li>
-          <li>Applied traditional IT skills — servers and networking — while operating and maintaining MIDS (Multifunctional Information Distribution System) terminals.</li>
-          <li>Operated in high-pressure joint environments requiring coordination, situational awareness and rapid decision-making.</li>
-          <li>Participated in NATO exercises and the Tactical Leadership Programme (TLP), following standardized NATO procedures and security protocols.</li>
+        <ul class="tl-list proj-list">
+
+          <li class="proj-item">
+            <button class="proj-title" type="button" aria-expanded="false">Ground Station &amp; System Administration<span class="hint-icon">+</span></button>
+            <div class="proj-pop">
+              <p>Operated and remotely administered a JTRS-based Link 16 terminal and antenna site from a ground station. Managed user accounts and access permissions through Active Directory, and configured shared network drives used to store sensitive mission-critical data.</p>
+              <div class="proj-tech-label">Technologies</div>
+              <div class="proj-tech">
+                <span class="tag">Active Directory</span>
+                <span class="tag">JTRS</span>
+                <span class="tag">GSS</span>
+                <span class="tag">Windows Server/Client</span>
+              </div>
+            </div>
+          </li>
+
+          <li class="proj-item">
+            <button class="proj-title" type="button" aria-expanded="false">Secure Configuration &amp; Data Handling<span class="hint-icon">+</span></button>
+            <div class="proj-pop">
+              <p>Received mission-critical parameters — including cryptographic keys and network/channel assignments — from higher headquarters and loaded them into the tactical data link system ahead of every mission. Coordinated correct configuration parameters with participating fighter squadrons to ensure network-wide interoperability.</p>
+              <div class="proj-tech-label">Technologies</div>
+              <div class="proj-tech">
+                <span class="tag">NDL Configuration</span>
+                <span class="tag">Cryptographic Key Handling</span>
+                <span class="tag">NATO STANAG (Link 16, JREAP-C, Link-11)</span>
+              </div>
+            </div>
+          </li>
+
+          <li class="proj-item">
+            <button class="proj-title" type="button" aria-expanded="false">Network Monitoring &amp; Troubleshooting<span class="hint-icon">+</span></button>
+            <div class="proj-pop">
+              <p>Monitored Link 16 network traffic in real time during live exercises to verify message integrity and track data accuracy. Diagnosed and resolved degraded wireless links and configuration mismatches under live operational time pressure, restoring full network participant status.</p>
+              <div class="proj-tech-label">Technologies</div>
+              <div class="proj-tech">
+                <span class="tag">Link 16 / TDMA</span>
+                <span class="tag">RF Troubleshooting</span>
+                <span class="tag">NATO TLP Procedures</span>
+              </div>
+            </div>
+          </li>
+
         </ul>
       </div>
+
+      <!-- Squadrone Academy -->
+      <div class="tl-item past">
+        <div class="tl-dot"></div>
+        <div class="tl-date">2021 — 2024</div>
+        <div class="tl-role">UAS / Drone Certified Flight &amp; Ground Instructor</div>
+        <div class="tl-org">Squadrone Academy</div>
+        <ul class="tl-list proj-list">
+
+          <li class="proj-item">
+            <button class="proj-title" type="button" aria-expanded="false">Flight &amp; Safety Instruction<span class="hint-icon">+</span></button>
+            <div class="proj-pop">
+              <p>Delivered hands-on flight training across various drone platforms, teaching UAS safety principles, pre-flight checklist procedures, and risk management practices to trainee pilots.</p>
+              <div class="proj-tech-label">Technologies</div>
+              <div class="proj-tech">
+                <span class="tag">UAS/Drone Platforms</span>
+                <span class="tag">Flight Training</span>
+              </div>
+            </div>
+          </li>
+
+          <li class="proj-item">
+            <button class="proj-title" type="button" aria-expanded="false">Standard Operating Procedures &amp; Risk Assessment<span class="hint-icon">+</span></button>
+            <div class="proj-pop">
+              <p>Enforced standard operating procedures (SOPs) and conducted risk assessments in accordance with PDRA and SORA frameworks, ensuring safe and compliant drone operations throughout training.</p>
+              <div class="proj-tech-label">Technologies</div>
+              <div class="proj-tech">
+                <span class="tag">PDRA</span>
+                <span class="tag">SORA</span>
+                <span class="tag">SOPs</span>
+                <span class="tag">Risk Assessment</span>
+              </div>
+            </div>
+          </li>
+
+        </ul>
+      </div>
+
     </div>
   </section>
 
@@ -431,6 +614,40 @@
 <footer>
   <div class="footer-line">LAST UPDATED AUG 2026</div>
 </footer>
+
+<script>
+  // Tap-to-toggle for touch devices; click outside closes; Escape closes.
+  document.querySelectorAll('.proj-item').forEach(function(item){
+    var btn = item.querySelector('.proj-title');
+    btn.addEventListener('click', function(e){
+      var isOpen = item.classList.contains('open');
+      document.querySelectorAll('.proj-item.open').forEach(function(other){
+        if(other !== item){
+          other.classList.remove('open');
+          other.querySelector('.proj-title').setAttribute('aria-expanded', 'false');
+        }
+      });
+      item.classList.toggle('open', !isOpen);
+      btn.setAttribute('aria-expanded', String(!isOpen));
+    });
+  });
+  document.addEventListener('click', function(e){
+    if(!e.target.closest('.proj-item')){
+      document.querySelectorAll('.proj-item.open').forEach(function(item){
+        item.classList.remove('open');
+        item.querySelector('.proj-title').setAttribute('aria-expanded', 'false');
+      });
+    }
+  });
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape'){
+      document.querySelectorAll('.proj-item.open').forEach(function(item){
+        item.classList.remove('open');
+        item.querySelector('.proj-title').setAttribute('aria-expanded', 'false');
+      });
+    }
+  });
+</script>
 
 </body>
 </html>
