@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Deploying Microsoft Sentinel with Bicep — I.R. Karantakis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0A0E12;
+    --panel: #10151C;
+    --panel-2: #141B24;
+    --line: #212B36;
+    --line-soft: #1A222C;
+    --text: #E7ECF1;
+    --muted: #8496A6;
+    --muted-2: #566575;
+    --cyan: #4FD8C4;
+    --cyan-dim: rgba(79,216,196,0.14);
+    --amber: #FF9642;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{
+    background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+    background-image:linear-gradient(var(--line-soft) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
+    background-size:48px 48px;background-position:-1px -1px;
+  }
+  a{color:var(--cyan);text-decoration:none;}
+  a:hover{text-decoration:underline;}
+  .wrap{max-width:760px;margin:0 auto;padding:0 28px;}
+  ::selection{background:var(--cyan-dim);color:var(--cyan);}
+
+  .topbar{position:sticky;top:0;z-index:50;background:rgba(10,14,18,0.85);
+    backdrop-filter:blur(10px);border-bottom:1px solid var(--line);}
+  .topbar-inner{display:flex;align-items:center;justify-content:space-between;
+    padding:16px 28px;max-width:760px;margin:0 auto;}
+  .brand{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:15px;
+    letter-spacing:0.02em;display:flex;align-items:center;gap:10px;color:var(--text);}
+  .brand-dot{width:8px;height:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 8px var(--cyan);
+    animation:blink 2.4s ease-in-out infinite;}
+  @keyframes blink{0%,100%{opacity:1;}50%{opacity:.35;}}
+  .navlinks{display:flex;gap:20px;font-size:12.5px;}
+  .navlinks a{color:var(--muted);font-family:'IBM Plex Mono',monospace;letter-spacing:.03em;
+    text-decoration:none;padding:4px 0;border-bottom:1px solid transparent;}
+  .navlinks a:hover{color:var(--cyan);border-color:var(--cyan);}
+
+  .hero{padding:56px 0 36px;}
+  .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--amber);
+    letter-spacing:.16em;text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:10px;}
+  .eyebrow::before{content:'';width:22px;height:1px;background:var(--amber);display:inline-block;}
+  h1{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:clamp(26px,4.6vw,36px);
+    line-height:1.15;letter-spacing:-.01em;margin-bottom:16px;}
+  .lede{color:#C4CDD6;font-size:15px;max-width:60ch;margin-bottom:16px;}
+  .stack-row{display:flex;flex-wrap:wrap;gap:6px;}
+  .tag{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#AEB9C4;
+    border:1px solid var(--line);padding:3px 8px;border-radius:3px;background:var(--panel-2);}
+
+  article{padding-bottom:80px;}
+  h2{font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:600;
+    margin:44px 0 14px;padding-top:26px;border-top:1px solid var(--line);}
+  article > h2:first-child{border-top:none;padding-top:0;margin-top:0;}
+  h3{font-family:'Space Grotesk',sans-serif;font-size:15.5px;font-weight:600;
+    color:var(--text);margin:24px 0 10px;}
+  p{color:#C4CDD6;font-size:14.5px;margin-bottom:14px;max-width:66ch;}
+  code{font-family:'IBM Plex Mono',monospace;font-size:0.88em;background:var(--panel-2);
+    border:1px solid var(--line);padding:1px 6px;border-radius:3px;color:var(--cyan);}
+
+  pre{background:var(--panel);border:1px solid var(--line);border-radius:6px;
+    padding:16px 18px;overflow-x:auto;margin:14px 0 20px;}
+  pre code{background:none;border:none;padding:0;color:#C9D3DC;font-size:12.5px;line-height:1.6;}
+
+  .result{display:flex;gap:10px;align-items:flex-start;background:var(--cyan-dim);
+    border:1px solid rgba(79,216,196,0.35);border-radius:6px;padding:12px 16px;margin:16px 0 24px;}
+  .result-mark{color:var(--cyan);font-family:'IBM Plex Mono',monospace;font-size:13px;flex-shrink:0;}
+  .result p{margin:0;color:#DCEFEC;font-size:13.5px;}
+
+  .shot{border:1px dashed var(--line);border-radius:6px;padding:36px 20px;text-align:center;
+    margin:18px 0 24px;background:var(--panel-2);}
+  .shot-label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted-2);
+    letter-spacing:.05em;text-transform:uppercase;}
+
+  .chain{font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--cyan);
+    background:var(--panel);border:1px solid var(--line);border-radius:6px;
+    padding:14px 18px;margin:16px 0 24px;text-align:center;}
+
+  .demonstrates{list-style:none;}
+  .demonstrates li{position:relative;padding-left:20px;margin-bottom:9px;font-size:14px;color:#C4CDD6;}
+  .demonstrates li::before{content:'▸';position:absolute;left:0;color:var(--muted-2);font-size:12px;top:1px;}
+
+  .repo-box{border:1px solid var(--line);border-radius:6px;padding:16px 18px;background:var(--panel);
+    display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:28px;}
+  .repo-box span{font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--muted);}
+
+  footer{padding:32px 0 60px;text-align:center;border-top:1px solid var(--line);}
+  .footer-line{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--muted-2);letter-spacing:.06em;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="brand"><span class="brand-dot"></span>I.R. KARANTAKIS</div>
+    <nav class="navlinks">
+      <a href="index.html">← CLOUD & INFRASTRUCTURE</a>
+      <a href="../../index.html">CV</a>
+    </nav>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="eyebrow">Cloud &amp; Infrastructure</div>
+    <h1>Deploying Microsoft Sentinel with Bicep</h1>
+    <p class="lede">A hands-on lab using Bicep to deploy a security monitoring stack in Azure — a Log Analytics Workspace, Microsoft Sentinel onboarding, and a Threat Intelligence data connector — version-controlled in an Azure DevOps repo.</p>
+    <div class="stack-row">
+      <span class="tag">Azure CLI</span>
+      <span class="tag">Bicep</span>
+      <span class="tag">VS Code</span>
+      <span class="tag">Azure DevOps</span>
+      <span class="tag">Microsoft Sentinel</span>
+    </div>
+  </div>
+
+  <article>
+
+    <h2>1. Environment Setup</h2>
+
+    <h3>Azure Subscription</h3>
+    <p>Created a free Azure subscription as the base for the lab.</p>
+
+    <h3>Local Tooling</h3>
+    <p>Installed the Azure CLI and Bicep CLI on Windows via <code>winget</code>:</p>
+    <pre><code>winget install -e --id Microsoft.AzureCLI
+az bicep install</code></pre>
+
+    <h3>Authentication</h3>
+    <p>Registered MFA on the tenant and authenticated the CLI:</p>
+    <pre><code>az login --tenant &lt;tenant-id&gt;</code></pre>
+
+    <h3>Version Control: Azure DevOps</h3>
+    <p>Rather than deploying ad hoc, I set up a proper Git-backed workflow: created an Azure DevOps organization and a private project (<code>bicep-learning</code>), initialized a repo, cloned it locally via VS Code's "Clone in VS Code" integration, and installed the official Bicep VS Code extension for syntax highlighting and validation.</p>
+
+    <h2>2. Building the Sentinel Stack</h2>
+
+    <h3>Log Analytics Workspace + Sentinel Onboarding</h3>
+    <p>Microsoft Sentinel runs on top of a Log Analytics Workspace, so the first resource creates the workspace and the second onboards Sentinel onto it:</p>
+
+    <pre><code>param location string = resourceGroup().location
+param workspaceName string = 'law-${uniqueString(resourceGroup().id)}'
+
+resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2022-10-01' = {
+  name: workspaceName
+  location: location
+  properties: {
+    sku: {
+      name: 'PerGB2018'
+    }
+    retentionInDays: 30
+  }
+}
+
+resource sentinelOnboarding 'Microsoft.SecurityInsights/onboardingStates@2023-02-01' = {
+  scope: logAnalytics
+  name: 'default'
+  properties: {}
+}
+
+output workspaceName string = logAnalytics.name
+output workspaceId string = logAnalytics.id</code></pre>
+
+    <p>The <code>scope: logAnalytics</code> line tells Bicep that the Sentinel resource depends on the workspace — deployment order is resolved automatically from that reference, with no manual sequencing needed.</p>
+
+    <p>Required resource providers were registered ahead of deployment:</p>
+    <pre><code>az provider register --namespace Microsoft.OperationsManagement
+az provider register --namespace Microsoft.SecurityInsights</code></pre>
+
+    <pre><code>az group create --name rg-test --location northeurope
+az deployment group create --resource-group rg-test --template-file sentinel.bicep</code></pre>
+
+    <div class="result">
+      <span class="result-mark">✓</span>
+      <p><strong>Result:</strong> <code>provisioningState: Succeeded</code></p>
+    </div>
+
+    <h2>3. Adding a Data Connector</h2>
+    <p>To complete the stack, I added a Threat Intelligence data connector on top of Sentinel:</p>
+
+    <pre><code>resource threatIntelConnector 'Microsoft.SecurityInsights/dataConnectors@2023-02-01' = {
+  scope: logAnalytics
+  name: 'ThreatIntelligenceConnector'
+  kind: 'ThreatIntelligence'
+  properties: {
+    tenantId: subscription().tenantId
+    tipLookbackPeriod: '2026-01-01T00:00:00Z'
+    dataTypes: {
+      indicators: {
+        state: 'Enabled'
+      }
+    }
+  }
+  dependsOn: [
+    sentinelOnboarding
+  ]
+}</code></pre>
+
+    <p>Here <code>dependsOn</code> is set explicitly, since the connector references the workspace indirectly through Sentinel rather than owning it directly.</p>
+
+    <div class="result">
+      <span class="result-mark">✓</span>
+      <p><strong>Result:</strong> deployment succeeded, with a clean three-level dependency chain.</p>
+    </div>
+
+    <div class="chain">Log Analytics Workspace → Sentinel Onboarding → Threat Intelligence Connector</div>
+
+
+    <h2>4. Cleanup</h2>
+    <p>Every resource created during this lab was deployed into an isolated, disposable resource group and torn down immediately after verification:</p>
+    <pre><code>az group delete --name rg-test</code></pre>
+    <p>Zero cost throughout — confirmed via Cost Management, which showed no charges reported for the billing period.</p>
+
+    <h2>What This Demonstrates</h2>
+    <ul class="demonstrates">
+      <li>Writing and iterating on Bicep templates with proper parameterization and outputs</li>
+      <li>Understanding and using both implicit (<code>scope</code>) and explicit (<code>dependsOn</code>) resource dependencies</li>
+      <li>Git-based IaC workflow: local edits → commit → push → CLI deployment, tracked in Azure DevOps</li>
+    </ul>
+
+  </article>
+
+</div>
+
+<footer>
+  <div class="footer-line">ioannis rafail karantakis · cybersecurity engineer</div>
+</footer>
+
+</body>
+</html>
